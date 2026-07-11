@@ -7,8 +7,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/twemoji.min.js" crossorigin="anonymous"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    img.emoji { height: 1em; width: 1em; margin: 0 0.05em 0 0.1em; vertical-align: -0.1em; }
 
     body {
       min-height: 100vh;
@@ -95,19 +98,13 @@
     .name {
       font-family: 'Quicksand', sans-serif;
       font-weight: 700; font-size: 1.05rem;
-      color: #6b4258; margin-bottom: 0.2rem;
+      color: #6b4258; margin-bottom: 1.4rem;
       letter-spacing: 0.01em; text-align: center;
     }
 
     .bio {
       font-size: 0.7rem; color: #c4a0b4;
       letter-spacing: 0.04em; margin-bottom: 1.4rem; text-align: center;
-    }
-
-    .divider {
-      width: 100%; height: 1px;
-      background: linear-gradient(to right, transparent, #ffd0e4 25%, #ffd0e4 75%, transparent);
-      margin-bottom: 1.4rem;
     }
 
     /* ── YEAR TABS ── */
@@ -143,7 +140,8 @@
 
     .mo-e { display: block; font-size: 1.1rem; margin-bottom: 0.22rem; line-height: 1; }
     .mo-n { font-size: 0.56rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #d4b0c4; }
-    .mo.active .mo-n { color: #f472b6; }
+    .mo-zh { display: block; font-size: 0.6rem; margin-top: 0.12rem; color: #d4b0c4; }
+    .mo.active .mo-n, .mo.active .mo-zh { color: #f472b6; }
 
     .footer { text-align: center; margin-top: 1.4rem; font-size: 0.6rem; color: #e4c8d4; letter-spacing: 0.1em; }
 
@@ -178,12 +176,11 @@
   <div class="left-col">
     <img class="avatar" src="Photos_jjm6Yu6m5x.png" alt="jammy">
     <p class="name">Jam Jam's jams</p>
-    <div class="divider"></div>
     <div class="years" id="years"></div>
     <div class="grid" id="grid"></div>
     <p class="footer">ketchup on the vibes ♡</p>
     <div class="bg-btns">
-      <button class="bg-btn active" data-bg="goboard" onclick="setBg('goboard')">⬛ 围棋</button>
+      <button class="bg-btn active" data-bg="goboard" onclick="setBg('goboard')">⬛ 圍棋</button>
       <button class="bg-btn" data-bg="taiwan" onclick="setBg('taiwan')">🌄 台灣</button>
     </div>
   </div>
@@ -747,10 +744,22 @@
 
   /* ── PLAYLIST UI ── */
   const MO = [
-    ['January','❄️'],['February','💕'],['March','🌱'],['April','🌸'],
-    ['May','🌼'],['June','☀️'],['July','🌊'],['August','🍉'],
-    ['September','🍂'],['October','🎃'],['November','🍁'],['December','⭐'],
+    ['January','一月'],['February','二月'],['March','三月'],['April','四月'],
+    ['May','五月'],['June','六月'],['July','七月'],['August','八月'],
+    ['September','九月'],['October','十月'],['November','十一月'],['December','十二月'],
   ];
+
+  const YEAR_EMOJI = {
+    2023: ['🐭','🐮','🐯','🐰','🐲','🐍','🐴','🐐','🐵','🐔','🐶','🐷'],
+    2024: ['🧧','🏮','🥟','🥮','🍜','🥠','🧋','🎊','🧨','🍵','🥡','🎆'],
+    2025: ['🪷','🐉','🎐','🌕','🥢','🍚','🀄️','🕯️','🎇','🐟','🌸','🪭'],
+    2026: ['🐼','🧧','🏮','🥟','🧋','🥮','🎊','🧨','🐉','🪷','🌕','🀄️'],
+  };
+  const EMOJI_SETS = Object.values(YEAR_EMOJI);
+  function monthEmoji(y, n) {
+    const set = YEAR_EMOJI[y] || EMOJI_SETS[y % EMOJI_SETS.length];
+    return set[n - 1];
+  }
 
   const DATA = {
     2023:{1:'7tR2wwnjfe97PyW1tWtykz',2:'6dbCPWapU039hYtgf32PS4',3:'6S8keN1VP8mgAiQUxSpyXR',4:'57IPqiAxh43xWtSwHkHmfM',5:'1QiYxnuOc3nGTQT6gq9JoN',6:'555CiMBAjrxAXwv3aU8qyp',7:'2niofGflJ2xqzpDJYITAME',8:'4DS9RLzBWB29l4RhL2f8yl',9:'6IPGKfzaWtyCfyn6mnGiXo',10:'3VbB6jfBtoHpiWNUIgxEAV',11:'1bHLHjC42Rm751cVtmTT4z',12:'2kAy0VNFJGPsCpQYDR9Dpi'},
@@ -778,17 +787,44 @@
     const g = document.getElementById('grid');
     g.innerHTML = '';
     const yd = DATA[year] || {};
-    MO.forEach(([name, emoji], i) => {
+    MO.forEach(([name, zh], i) => {
       const n = i + 1, has = !!yd[n];
       const el = document.createElement('div');
       el.className = 'mo' + (!has ? ' empty' : '') + (month === n ? ' active' : '');
-      el.innerHTML = `<span class="mo-e">${emoji}</span><span class="mo-n">${name.slice(0,3)}</span>`;
+      el.innerHTML = `<span class="mo-e">${monthEmoji(year, n)}</span><span class="mo-n">${name.slice(0,3)}</span><span class="mo-zh">${zh}</span>`;
       if (has) el.onclick = () => pick(n);
       g.appendChild(el);
     });
+    twemoji.parse(g);
+  }
+
+  /* ── SECRET CODE: on 2025, click jan feb jun jul nov dec in quick succession ── */
+  const SECRET_YEAR = 2025;
+  const SECRET_CODE = [1, 2, 6, 7, 11, 12];
+  const SECRET_MAX_GAP = 2000;
+  let secretBuffer = [];
+  let secretLastClick = 0;
+
+  function checkSecretCode(n) {
+    if (year !== SECRET_YEAR) { secretBuffer = []; return false; }
+    const now = Date.now();
+    if (now - secretLastClick > SECRET_MAX_GAP) secretBuffer = [];
+    secretLastClick = now;
+    secretBuffer.push(n);
+    if (secretBuffer.length > SECRET_CODE.length) secretBuffer.shift();
+    if (secretBuffer.length === SECRET_CODE.length && secretBuffer.every((v, i) => v === SECRET_CODE[i])) {
+      secretBuffer = [];
+      return true;
+    }
+    return false;
   }
 
   function pick(n) {
+    if (checkSecretCode(n)) {
+      window.location.href = 'secret-song/secret.html';
+      return;
+    }
+
     month = n;
     document.querySelectorAll('.mo').forEach((el, i) => el.classList.toggle('active', i + 1 === n));
 
@@ -799,12 +835,14 @@
     frame.height = '352';
     frame.style.cssText = 'display:block;width:100%;border:none;';
     frame.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
-    frame.src = `https://open.spotify.com/embed/playlist/${DATA[year][n]}?utm_source=generator&autoplay=1`;
+    frame.src = `https://open.spotify.com/embed/playlist/${DATA[year][n]}?utm_source=generator&autoplay=1&_=${Date.now()}`;
     box.appendChild(frame);
 
     document.getElementById('hint').style.display = 'none';
     document.getElementById('player').classList.add('on');
-    document.getElementById('lbl').innerHTML = `${MO[n-1][1]} <em>${MO[n-1][0]}</em> · ${year}`;
+    const lbl = document.getElementById('lbl');
+    lbl.innerHTML = `${monthEmoji(year, n)} <em>${MO[n-1][0]} · ${MO[n-1][1]}</em> · ${year}`;
+    twemoji.parse(lbl);
   }
 
   function clearPlayer() {
